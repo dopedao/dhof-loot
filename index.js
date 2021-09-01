@@ -8,12 +8,6 @@ const lootAddress = "0x8707276df042e89669d69a177d3da7dc78bd8723";
 const rpc = new ethers.providers.JsonRpcProvider(process.env.RPC_CONNSTRING);
 const loot = new ethers.Contract(lootAddress, abi, rpc);
 
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}
-
 async function collect(i) {
   console.log("Collecting: ", i);
 
