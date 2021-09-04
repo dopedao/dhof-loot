@@ -45,6 +45,37 @@ const fs = require("fs");
     rarest: i + 1,
   }));
 
-  // Print loot rarity
+  // Print loot rarity by score
   await fs.writeFileSync("./output/rare.json", JSON.stringify(scores));
+
+  // Calculate pure probability
+  let probability = [];
+  for (let i = 0; i < loot.length; i++) {
+    let scores = [];
+    const attributes = loot[i][(i + 1).toString()];
+
+    for (const attribute of Object.values(attributes)) {
+      // Collect probability of individual attribute occurences
+      scores.push(rarityIndex[attribute] / 8000);
+    }
+
+    // Multiply probabilites P(A and B) = P(A) * P(B)
+    const p = scores.reduce((a, b) => a * b);
+    probability.push({ lootId: i + 1, score: p });
+  }
+
+  // Sort by probability
+  probability = probability.sort((a, b) => a.score - b.score);
+  // Sort by index of probability
+  probability = probability.map((loot, i) => ({
+    ...loot,
+    score: Math.abs(Math.log(loot.score)),
+    rarest: i + 1,
+  }));
+
+  // Print loot rarity by score
+  await fs.writeFileSync(
+    "./output/probability.json",
+    JSON.stringify(probability)
+  );
 })();
