@@ -53,6 +53,8 @@ async function collect(i) {
     } catch (err) {
       console.log(err)
       console.log("Retrying: ", i)
+
+      const loot = await collect(i)
       // Push parts to array
       retrievedLoot.push({
         [i]: loot,
