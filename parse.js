@@ -88,13 +88,17 @@ const { suffixes, namePrefixes, nameSuffixes } = parts;
     const attributes = loot[i][(i + 1).toString()];
 
     // Add up number of occurences of attributes
-    for (const [category, item] of Object.entries(attributes)) {
-      if (category in items) {
-        items[category].push(item)
+    for (const [attribute, item] of Object.entries(attributes)) {
+      if (attribute in items) {
+        items[attribute].push(item)
         continue
       }
-      items[category] = [item];
+      items[attribute] = [item];
     }
+  }
+
+  for (const [attribute, item] of Object.entries(items)) {
+    items[attribute] = Array.from(new Set(item))
   }
 
   // Output occurences
@@ -104,14 +108,15 @@ const { suffixes, namePrefixes, nameSuffixes } = parts;
   );
 
   const itemCount = {
-    chest: 0,
+    clothes: 0,
     foot: 0,
     hand: 0,
-    head: 0,
+    drugs: 0,
     neck: 0,
     ring: 0,
     waist: 0,
     weapon: 0,
+    vehicle: 0,
   };
 
   const itemsCounted = Object.keys(items).reduce((acc, key) => {

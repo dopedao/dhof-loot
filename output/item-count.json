@@ -1,13 +1,11 @@
 {
-    "chest": 0,
-    "foot": 8000,
-    "hand": 8000,
-    "head": 0,
-    "neck": 8000,
-    "ring": 8000,
-    "waist": 8000,
-    "weapon": 8000,
-    "clothes": 8000,
-    "drugs": 8000,
-    "vehicle": 8000
+    "clothes": 1186,
+    "foot": 1082,
+    "hand": 905,
+    "drugs": 754,
+    "neck": 755,
+    "ring": 818,
+    "waist": 1025,
+    "weapon": 1030,
+    "vehicle": 1074
 }
