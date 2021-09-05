@@ -1,5 +1,8 @@
 // Imports
 const fs = require("fs");
+const parts = require("./output/item-parts.json");
+
+const { suffixes, namePrefixes, nameSuffixes } = parts;
 
 (async () => {
   // Load loot data
@@ -98,5 +101,27 @@ const fs = require("fs");
   await fs.writeFileSync(
     "./output/items.json",
     JSON.stringify(items, null, 4)
+  );
+
+  const itemCount = {
+    chest: 0,
+    foot: 0,
+    hand: 0,
+    head: 0,
+    neck: 0,
+    ring: 0,
+    waist: 0,
+    weapon: 0,
+  };
+
+  const itemsCounted = Object.keys(items).reduce((acc, key) => {
+    acc[key] = items[key].length;
+    return acc;
+  }, itemCount);
+
+  // Output items
+  fs.writeFileSync(
+    "./output/item-count.json",
+    JSON.stringify(itemsCounted, null, 4)
   );
 })();
