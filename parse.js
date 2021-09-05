@@ -28,8 +28,8 @@ const { suffixes, namePrefixes, nameSuffixes } = parts;
     JSON.stringify(rarityIndex, null, 4)
   );
 
-  // Calculate occurence scores
-  let scores = [];
+  // Calculate occurence rare
+  let rare = [];
   for (let i = 0; i < loot.length; i++) {
     let score = 0;
     const attributes = loot[i][(i + 1).toString()];
@@ -37,33 +37,22 @@ const { suffixes, namePrefixes, nameSuffixes } = parts;
     for (const attribute of Object.values(attributes)) {
       score += rarityIndex[attribute];
     }
-    scores.push({ lootId: i + 1, score });
+    rare.push({ lootId: i + 1, score });
   }
-
-  // Sort by score
-  scores = scores.sort((a, b) => a.score - b.score);
-  // Sort by index of score
-  scores = scores.map((loot, i) => ({
-    ...loot,
-    rarest: i + 1,
-  }));
-
-  // Print loot rarity by score
-  await fs.writeFileSync("./output/rare.json", JSON.stringify(scores, null, 4));
 
   // Calculate pure probability
   let probability = [];
   for (let i = 0; i < loot.length; i++) {
-    let scores = [];
+    let rare = [];
     const attributes = loot[i][(i + 1).toString()];
 
     for (const attribute of Object.values(attributes)) {
       // Collect probability of individual attribute occurences
-      scores.push(rarityIndex[attribute] / 8000);
+      rare.push(rarityIndex[attribute] / 8000);
     }
 
     // Multiply probabilites P(A and B) = P(A) * P(B)
-    const p = scores.reduce((a, b) => a * b);
+    const p = rare.reduce((a, b) => a * b);
     probability.push({ lootId: i + 1, score: p });
   }
 
@@ -129,4 +118,97 @@ const { suffixes, namePrefixes, nameSuffixes } = parts;
     "./output/item-count.json",
     JSON.stringify(itemsCounted, null, 4)
   );
+
+  const inventorySlots = {
+    clothes: [],
+    foot: [],
+    hand: [],
+    drugs: [],
+    neck: [],
+    ring: [],
+    waist: [],
+    weapon: [],
+    vehicle: [],
+  };
+
+  let rareUpdate = [];
+  const itemParts = [];
+  loot.reduce((slots, bag, index) => {
+    let itemScore = 0;
+    const id = index + 1;
+    const bagSlots = bag[id];
+    const existingRarity = rare.find((item) => item.lootId === id);
+
+    Object.keys(bagSlots).forEach((slot) => {
+      const item = bagSlots[slot];
+      const itemPart = parseItemParts(bagSlots);
+      itemParts.push({ [id]: itemPart });
+      itemScore += itemPart[slot].score;
+
+      if (!slots[slot].includes(item)) {
+        slots[slot] = [...slots[slot], item];
+      }
+    });
+
+    rareUpdate.push({
+      ...existingRarity,
+      itemScore,
+    });
+
+    return slots;
+  }, inventorySlots);
+
+  // Sort by score
+  rareUpdate = rareUpdate.sort((a, b) => a.score - b.score);
+  // Sort by index of score
+  rareUpdate = rareUpdate.map((loot, i) => ({
+    ...loot,
+    rarest: i + 1,
+  }));
+
+  // Print loot rarity by score
+  await fs.writeFileSync("./output/rare.json", JSON.stringify(rareUpdate, null, 4));
+
+  function parseItemParts(item) {
+    return Object.keys(item).reduce((acc, slot) => {
+      let score = 1;
+      const name = item[slot];
+
+      acc[slot] = {
+        item: findItemType(name, parts),
+        suffix: suffixes.find((suffix) => name.includes(suffix)) || null,
+        namePrefix: namePrefixes.find((prefix) => name.includes(prefix)) || null,
+        nameSuffix: nameSuffixes.find((suffix) => name.includes(suffix)) || null,
+        bonus: name.includes("+1"),
+      };
+      if (acc[slot].suffix) score++;
+      if (name.startsWith('"')) score++;
+      if (acc[slot].bonus) score++;
+
+      acc[slot].score = score;
+      return acc;
+    }, {});
+  }
+
+  function findItemType(item, parts) {
+    const hasPart = (part) => item.includes(part);
+    const weapon = parts.weapons.filter(hasPart)[0];
+    if (weapon) return weapon;
+    const clothes = parts.clothes.filter(hasPart)[0];
+    if (clothes) return clothes;
+    const drugs = parts.drugs.filter(hasPart)[0];
+    if (drugs) return drugs;
+    const vehicle = parts.vehicle.filter(hasPart)[0];
+    if (vehicle) return vehicle;
+    const waist = parts.waistArmor.filter(hasPart)[0];
+    if (waist) return waist;
+    const foot = parts.footArmor.filter(hasPart)[0];
+    if (foot) return foot;
+    const hand = parts.handArmor.filter(hasPart)[0];
+    if (hand) return hand;
+    const necklace = parts.necklaces.filter(hasPart)[0];
+    if (necklace) return necklace;
+    const ring = parts.rings.filter(hasPart)[0];
+    if (ring) return ring;
+  }
 })();
