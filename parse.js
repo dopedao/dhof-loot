@@ -10,14 +10,14 @@ const { suffixes, namePrefixes, nameSuffixes } = parts;
   const loot = JSON.parse(data);
 
   // Calculate attribute rarities
-  let rarityIndex = {};
+  let occurences = {};
   for (let i = 0; i < loot.length; i++) {
     const attributes = loot[i][(i + 1).toString()];
 
     // Add up number of occurences of attributes
     for (const attribute of Object.values(attributes)) {
-      rarityIndex[attribute] = rarityIndex[attribute]
-        ? rarityIndex[attribute] + 1
+      occurences[attribute] = occurences[attribute]
+        ? occurences[attribute] + 1
         : 1;
     }
   }
@@ -25,7 +25,7 @@ const { suffixes, namePrefixes, nameSuffixes } = parts;
   // Output occurences
   await fs.writeFileSync(
     "./output/occurences.json",
-    JSON.stringify(rarityIndex, null, 4)
+    JSON.stringify(occurences, null, 4)
   );
 
   // Calculate occurence rare
@@ -35,7 +35,7 @@ const { suffixes, namePrefixes, nameSuffixes } = parts;
     const attributes = loot[i][(i + 1).toString()];
 
     for (const attribute of Object.values(attributes)) {
-      score += rarityIndex[attribute];
+      score += occurences[attribute];
     }
     rare.push({ lootId: i + 1, score });
   }
@@ -48,7 +48,7 @@ const { suffixes, namePrefixes, nameSuffixes } = parts;
 
     for (const attribute of Object.values(attributes)) {
       // Collect probability of individual attribute occurences
-      rare.push(rarityIndex[attribute] / 8000);
+      rare.push(occurences[attribute] / 8000);
     }
 
     // Multiply probabilites P(A and B) = P(A) * P(B)
@@ -90,7 +90,7 @@ const { suffixes, namePrefixes, nameSuffixes } = parts;
     items[attribute] = Array.from(new Set(item))
   }
 
-  // Output occurences
+  // Output items
   await fs.writeFileSync(
     "./output/items.json",
     JSON.stringify(items, null, 4)
@@ -113,7 +113,7 @@ const { suffixes, namePrefixes, nameSuffixes } = parts;
     return acc;
   }, itemCount);
 
-  // Output items
+  // Output item counts
   fs.writeFileSync(
     "./output/item-count.json",
     JSON.stringify(itemsCounted, null, 4)
@@ -169,6 +169,37 @@ const { suffixes, namePrefixes, nameSuffixes } = parts;
   // Print loot rarity by score
   await fs.writeFileSync("./output/rare.json", JSON.stringify(rareUpdate, null, 4));
 
+  // Generate item rarities
+  const byLevel = Object.entries(occurences).reduce(
+    (byLevel, [name, occurences]) => {
+      const level = levelFromOccurences(Number(occurences));
+      byLevel[name] = level;
+      return byLevel;
+    },
+    {}
+  );
+
+  // Output item rarities
+  fs.writeFileSync(
+    "./output/item-rarities.json",
+    JSON.stringify(byLevel, null, 4)
+  );
+
+  // Common:       above 350     34.9% (25129 items)
+  // Uncommon:   350 or less    20.18% (14528 items)
+  // Rare:       310 or less    16.51% (11889 items)
+  // Epic:       130 or less    10.27%  (7393 items)
+  // Legendary:    7 or less     9.21%  (6634 items)
+  // Mythic:       exactly 1     8.93%  (6427 items)
+  function levelFromOccurences(occurences) {
+    for (let i = 1, len = 6; i < len; i++) {
+      if (occurences > [-1, 350, 310, 130, 7, 1][i]) {
+        return i;
+      }
+    }
+    return 6;
+  }
+
   function parseItemParts(item) {
     return Object.keys(item).reduce((acc, slot) => {
       let score = 1;
@@ -212,3 +243,4 @@ const { suffixes, namePrefixes, nameSuffixes } = parts;
     if (ring) return ring;
   }
 })();
+
