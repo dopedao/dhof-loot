@@ -1,6 +1,6 @@
 {
   "name": "dope-metrics",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Collects details about the DOPE project",
   "main": "lib",
   "scripts": {
