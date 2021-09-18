@@ -2,11 +2,12 @@
   "name": "dope-metrics",
   "version": "1.0.2",
   "description": "Collects details about the DOPE project",
-  "main": "index.js",
+  "main": "lib",
   "scripts": {
     "collect": "node index.js",
     "parse": "node parse.js",
-    "images": "node images.js"
+    "images": "node images.js",
+    "build": "node build.js"
   },
   "keywords": [
     "dope",
@@ -17,5 +18,8 @@
   "license": "MIT",
   "dependencies": {
     "ethers": "^5.4.5"
+  },
+  "devDependencies": {
+    "json-to-es-module": "^2.0.2"
   }
 }
