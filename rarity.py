@@ -14,7 +14,7 @@ def traitCount():
     """
     Note:
     There are some clashes, eg namePrefix Big is substr of suffix "from Big
-    Smoke" and "from the Big Easy". These are handeled by anchoring to the
+    Smoke" and "from the Big Easy". These are handled by anchoring to the
     quote leading the name prefix.
 
     NameSuffixes "Killer" and "Sin" are also handled by anchoring to the
