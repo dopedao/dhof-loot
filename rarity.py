@@ -36,7 +36,8 @@ def traitCount():
                   'Leather Gloves': 'Studded Leather Gloves',
                   'Knife': 'Pocket Knife',
                   'Scooter': 'Electric Scooter',
-                  'Bike': 'Push Bike'}
+                  'Bike': 'Push Bike',
+                  'The Orphan': 'The Orphan Maker'}
     r = {}
     for key in tokens[0]['1'].keys():
         kd, k, j = {}, {}, {}
@@ -65,8 +66,12 @@ def traitCount():
                 c = 0
                 for item in tokens:
                     i = next(iter(item.values()))
-                    if (fmtStr % part) in i[key]:
-                        c += 1
+                    if part in exclusions:
+                        if ((fmtStr % part) in i[key]) and (exclusions[part] not in i[key]):
+                            c += 1
+                    else:
+                        if (fmtStr % part) in i[key]:
+                            c += 1
                 k[part] = c
             kd[namePart] = dict(sorted(k.items(), key=lambda x: x[1]))
 
