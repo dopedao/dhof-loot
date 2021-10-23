@@ -12,7 +12,6 @@
         "Police Baton",
         "Pepper Spray",
         "Razor Blade",
-        "Chain",
         "Taser",
         "Brass Knuckles",
         "Shotgun",
@@ -236,22 +235,16 @@
         "Soccer Dad"
     ],
     "nameSuffixes": [
-        "Feared",
         "Baron",
         "Vicious",
-        "Killer",
         "Fugitive",
         "Triggerman",
-        "Conman",
         "Outlaw",
         "Assassin",
-        "Shooter",
         "Hitman",
         "Bloodstained",
-        "Punishment",
         "Sin",
         "Smuggled",
-        "LastResort",
         "Contraband",
         "Illicit"
     ]
